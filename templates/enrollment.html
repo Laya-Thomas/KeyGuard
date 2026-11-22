@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Behavioral Enrollment</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-header">
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="{{ url_for('logout') }}"
+               style="padding: 10px 18px;
+                      background: #dc3545;
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 6px;">
+                Logout
+            </a>
+        </div>
+        <h1>Behavioral Enrollment</h1>
+        <p>
+            Register your unique typing pattern with KeyGuard.
+        </p>
+    </div>
+
+    <div class="card">
+
+        <h2>Keystroke Enrollment</h2>
+
+        <p>
+            Type the following phrase naturally.
+            You must complete three samples.
+        </p>
+
+        <h2 class="typing-phrase">.tie5Roanl</h2>
+
+        <p>
+            Type the phrase exactly as displayed,
+            including the capital letter R.
+        </p>
+
+        <input
+            type="text"
+            id="typingInput"
+            placeholder="Type .tie5Roanl here"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            required
+        >
+
+        <button id="captureButton" type="button">
+            Start Enrollment
+        </button>
+
+        <p id="progressMessage" role="status" aria-live="polite">
+            Enrollment samples completed: 0 / 3
+        </p>
+
+        <p id="statusMessage" role="status" aria-live="polite"></p>
+
+    </div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/keystroke.js') }}"></script>
+
+<script>
+
+const typingInput = document.getElementById("typingInput");
+const captureButton = document.getElementById("captureButton");
+const progressMessage = document.getElementById("progressMessage");
+const statusMessage = document.getElementById("statusMessage");
+
+const EXPECTED_PHRASE = ".tie5Roanl";
+const REQUIRED_SAMPLES = 3;
+
+let completedSamples = 0;
+let extractor = null;
+let isCapturing = false;
+let isSubmitting = false;
+
+
+// =====================================================
+// START ENROLLMENT CAPTURE
+// =====================================================
+
+function startCapture() {
+
+    if (isCapturing || isSubmitting) {
+        return;
+    }
+
+    if (typeof KeystrokeExtractor === "undefined") {
+        statusMessage.textContent =
+            "Keystroke capture system could not be loaded.";
+
+        return;
+    }
+
+    typingInput.value = "";
+
+    extractor = new KeystrokeExtractor();
+    extractor.start();
+
+    isCapturing = true;
+
+    typingInput.disabled = false;
+    typingInput.focus();
+
+    captureButton.textContent = "Submit Sample";
+
+    statusMessage.textContent =
+        "Type .tie5Roanl, press ENTER on your keyboard, then click Submit Sample.";
+
+}
+
+
+// =====================================================
+// SUBMIT ENROLLMENT SAMPLE
+// =====================================================
+
+async function submitCapture() {
+
+    if (!isCapturing || !extractor || isSubmitting) {
+        return;
+    }
+
+    const enteredPhrase = typingInput.value;
+
+    if (enteredPhrase !== EXPECTED_PHRASE) {
+
+        statusMessage.textContent =
+            "Incorrect phrase. Please type .tie5Roanl exactly.";
+
+        return;
+    }
+
+    const capturedData = extractor.stop();
+
+    isCapturing = false;
+    isSubmitting = true;
+
+    typingInput.disabled = true;
+    captureButton.disabled = true;
+
+    const events = capturedData.events;
+
+    if (!events || events.length !== 12) {
+
+        statusMessage.textContent =
+            "Incomplete typing sample. Please try again.";
+
+        resetCapture();
+        return;
+    }
+
+    statusMessage.textContent =
+        "Saving your enrollment sample...";
+
+    try {
+
+        const response = await fetch(
+            "/api/save-keystroke-sample",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    events: events,
+                    enrollment: true,
+                    authentication: false
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || "Unable to save enrollment sample."
+            );
+        }
+
+        completedSamples = result.enrollment_count;
+
+        progressMessage.textContent =
+            "Enrollment samples completed: " +
+            completedSamples + " / " + REQUIRED_SAMPLES;
+
+        if (result.enrollment_completed) {
+
+            statusMessage.textContent =
+                "Enrollment completed successfully! Redirecting to behavioral authentication...";
+
+            captureButton.textContent = "Enrollment Completed";
+
+            setTimeout(function () {
+                window.location.href = "/authentication";
+            }, 1200);
+
+            return;
+        }
+
+        statusMessage.textContent =
+            "Sample " + completedSamples +
+            " saved successfully. Prepare for the next sample.";
+
+        resetCapture();
+
+    } catch (error) {
+
+        statusMessage.textContent = error.message;
+
+        resetCapture();
+    }
+
+}
+
+
+// =====================================================
+// RESET FOR NEXT SAMPLE
+// =====================================================
+
+function resetCapture() {
+
+    if (extractor && isCapturing) {
+        extractor.stop();
+    }
+
+    extractor = null;
+    isCapturing = false;
+    isSubmitting = false;
+
+    typingInput.value = "";
+    typingInput.disabled = false;
+
+    captureButton.disabled = false;
+    captureButton.textContent = "Start Next Sample";
+
+}
+
+
+// =====================================================
+// BUTTON EVENT
+// =====================================================
+
+captureButton.addEventListener("click", function () {
+
+    if (!isCapturing) {
+        startCapture();
+    } else {
+        submitCapture();
+    }
+
+});
+
+
+// =====================================================
+// INITIAL PAGE STATE
+// =====================================================
+
+typingInput.value = "";
+
+progressMessage.textContent =
+    "Enrollment samples completed: 0 / 3";
+
+statusMessage.textContent =
+    "Click Start Enrollment to begin.";
+
+</script>
+
+</body>
+</html>

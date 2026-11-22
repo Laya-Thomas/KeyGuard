@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+keyguard.db
+*.sqlite3
+.env
+.env.*
+.vscode/
+*.log
+
+# Private user behavioral data
+dataset/authentication_dataset.csv
+dataset/authentication_dataset_backup.csv
+dataset/live_keystroke_dataset.csv
+dataset/live_keystroke_dataset_backup.csv
+
+# Backup models and duplicate experimental models
+models_backup/
+models/*.pkl
+models/random_forest*.joblib
+models/svm*.joblib

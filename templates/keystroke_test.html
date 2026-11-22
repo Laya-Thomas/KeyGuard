@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Keystroke Testing</title>
+
+    <style>
+        body {
+            background: #101827;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: #1c293b;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        h1 {
+            color: #38bdf8;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #0284c7;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #0b1220;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .note {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>KeyGuard Keystroke Testing</h1>
+
+    <p>Test your keyboard timing measurements.</p>
+
+    <p class="note">
+        Type a short test phrase after starting capture.
+        Do not use your real password on this test page.
+    </p>
+
+    <input
+        type="text"
+        id="typingInput"
+        placeholder="Type your test phrase here..."
+        autocomplete="off"
+        disabled
+    >
+
+    <br>
+
+    <button id="startButton">Start Capture</button>
+
+    <button id="stopButton" disabled>Stop Capture</button>
+
+    <button id="resetButton">Reset</button>
+
+    <h3>Captured Timing Features</h3>
+
+    <pre id="results">No data captured yet.</pre>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/keystroke.js') }}"></script>
+
+<script>
+
+    const extractor = new KeystrokeExtractor();
+
+    const input = document.getElementById("typingInput");
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const resetButton = document.getElementById("resetButton");
+    const results = document.getElementById("results");
+
+    startButton.addEventListener("click", function() {
+
+        extractor.start();
+
+        input.value = "";
+        input.disabled = false;
+        input.focus();
+
+        startButton.disabled = true;
+        stopButton.disabled = false;
+
+        results.textContent = "Capturing keystroke timings...";
+
+    });
+
+    stopButton.addEventListener("click", async function() {
+
+    const features = extractor.stop();
+
+    input.disabled = true;
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    results.textContent = JSON.stringify(
+        features,
+        null,
+        4
+    );
+
+    try {
+        const response = await fetch("/api/save-keystroke-sample", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                events: features.events
+            })
+        });
+
+        const result = await response.json();
+
+        results.textContent += "\n\nSERVER RESPONSE:\n" +
+            JSON.stringify(result, null, 4);
+
+    } catch (error) {
+        results.textContent += "\n\nError connecting to Flask: " +
+            error.message;
+    }
+
+    });
+
+    resetButton.addEventListener("click", function() {
+
+        extractor.stop();
+        extractor.reset();
+
+        input.value = "";
+        input.disabled = true;
+
+        startButton.disabled = false;
+        stopButton.disabled = true;
+
+        results.textContent = "No data captured yet.";
+
+    });
+
+</script>
+
+</body>
+</html>

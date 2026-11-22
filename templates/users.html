@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | User Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ==========================================
+     NAVIGATION BAR
+=========================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+            Key<span style="color: var(--cyan);">Guard</span>
+        </a>
+    </div>
+
+    <div>
+        <span style="color: var(--text-secondary);">
+            Administrator
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+            Logout
+        </a>
+    </div>
+
+</nav>
+
+
+<!-- ==========================================
+     MAIN CONTENT
+=========================================== -->
+
+<div class="container">
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <h1>User Management</h1>
+
+        <p>
+            View and monitor all registered KeyGuard accounts.
+        </p>
+
+    </div>
+
+
+    <!-- USER STATISTICS -->
+
+    <h2>Account Overview</h2>
+
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+
+            <p>Total Registered Accounts</p>
+
+            <h2>{{ total_users }}</h2>
+
+            <p>Accounts registered in KeyGuard</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <p>Account Management</p>
+
+            <h2 style="font-size: 1.5rem;">
+                Active
+            </h2>
+
+            <p>User administration panel</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <p>Access Control</p>
+
+            <h2 style="font-size: 1.5rem;">
+                Enabled
+            </h2>
+
+            <p>Role-based account management</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- REGISTERED USERS TABLE -->
+
+    <div style="margin-top: 40px;">
+
+        <div class="card">
+
+            <h2>Registered Users</h2>
+
+            <p>
+                List of accounts registered in the KeyGuard system.
+            </p>
+
+            {% if users %}
+
+                <div style="overflow-x: auto;">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Account Role</th>
+                                <th>Account Created</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for user in users %}
+
+                                <tr>
+
+                                    <td>
+                                        #{{ user.id }}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ user.username }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+
+                                        {% if user.role == "admin" %}
+
+                                            <span style="color: var(--cyan);">
+                                                Administrator
+                                            </span>
+
+                                        {% else %}
+
+                                            <span style="color: #93c5fd;">
+                                                Normal User
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {{ user.created_at }}
+                                    </td>
+
+                                    <td>
+                                        <span style="color: var(--success);">
+                                            ● Registered
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div style="
+                    text-align: center;
+                    padding: 35px 15px;
+                ">
+
+                    <h3>No Registered Users</h3>
+
+                    <p>
+                        No user accounts have been registered yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ADMIN ACTIONS -->
+
+    <div style="margin-top: 30px;">
+
+        <h2>Administration</h2>
+
+        <div class="dashboard-grid">
+
+            <div class="card">
+
+                <h3>User Management</h3>
+
+                <p>
+                    Review registered accounts and their assigned roles.
+                </p>
+
+                <p style="color: var(--success);">
+                    ● Account records available
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Admin Dashboard</h3>
+
+                <p>
+                    Return to the main administration control panel.
+                </p>
+
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="btn">
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

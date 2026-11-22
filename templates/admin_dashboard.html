@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- =================================================
+     TOP NAVIGATION
+================================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+            Key<span style="color: var(--cyan);">Guard</span>
+        </a>
+    </div>
+
+    <div>
+        <span style="color: var(--text-secondary);">
+            Administrator
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+            Logout
+        </a>
+    </div>
+
+</nav>
+
+
+<!-- =================================================
+     MAIN DASHBOARD
+================================================== -->
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>Admin Dashboard</h1>
+
+        <p>
+            Welcome back, {{ username }}.
+            Monitor and manage your KeyGuard authentication system.
+        </p>
+
+    </div>
+
+
+    <!-- SYSTEM OVERVIEW -->
+
+    <h2>System Overview</h2>
+
+    <div class="dashboard-grid">
+
+        <!-- MODEL STATUS -->
+
+        <div class="stat-card">
+
+            <p>Machine Learning Model</p>
+
+            <h2 style="font-size: 1.45rem;">
+                {{ model_status }}
+            </h2>
+
+            <p style="color: var(--success);">
+                ● Authentication Model
+            </p>
+
+        </div>
+
+
+        <!-- REGISTERED USERS -->
+
+        <div class="stat-card">
+
+            <p>Total Registered Accounts</p>
+
+            <h2>{{ total_users }}</h2>
+
+            <p>Registered KeyGuard accounts</p>
+
+        </div>
+
+
+        <!-- SYSTEM STATUS -->
+
+        <div class="stat-card">
+
+            <p>System Status</p>
+
+            <h2 style="color: var(--success);">
+                Online
+            </h2>
+
+            <p>Flask application is running</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADMIN NAVIGATION -->
+
+    <div style="margin-top: 45px;">
+
+        <h2>Administration Center</h2>
+
+        <p>
+            Manage users, datasets and machine learning analysis.
+        </p>
+
+
+        <div class="dashboard-grid">
+
+            <!-- USER MANAGEMENT -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">01.</span>
+                    User Management
+                </h3>
+
+                <p>
+                    View registered users and manage
+                    KeyGuard accounts.
+                </p>
+
+                <a href="{{ url_for('admin_users') }}"
+                   class="btn">
+                    Manage Users
+                </a>
+
+            </div>
+
+
+            <!-- DATASET MANAGEMENT -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">02.</span>
+                    Dataset Management
+                </h3>
+
+                <p>
+                    Explore the CMU keystroke dataset,
+                    samples, subjects and features.
+                </p>
+
+                <a href="{{ url_for('admin_dataset') }}"
+                   class="btn">
+                    View Dataset
+                </a>
+
+            </div>
+
+
+            <!-- DATA ANALYSIS -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">03.</span>
+                    Data Analysis
+                </h3>
+
+                <p>
+                    Explore keystroke timing patterns,
+                    statistical analysis and visualizations.
+                </p>
+
+                <a href="{{ url_for('admin_analysis') }}"
+                   class="btn">
+                    View Analysis
+                </a>
+
+            </div>
+
+
+            <!-- MODEL TRAINING -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">04.</span>
+                    Model Training
+                </h3>
+
+                <p>
+                    Review the machine learning training
+                    process and saved authentication model.
+                </p>
+
+                <p style="color: var(--warning);">
+                    Training is managed through the Python scripts.
+                </p>
+
+            </div>
+
+
+            <!-- MODEL EVALUATION -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">05.</span>
+                    Model Evaluation
+                </h3>
+
+                <p>
+                    Review accuracy, precision, recall,
+                    F1-score and confusion matrix results.
+                </p>
+
+                <p style="color: var(--warning);">
+                    Evaluation reports are available in the models folder.
+                </p>
+
+            </div>
+
+
+            <!-- AUTHENTICATION SYSTEM -->
+
+            <div class="card">
+
+                <h3>
+                    <span style="color: var(--cyan);">06.</span>
+                    Authentication System
+                </h3>
+
+                <p>
+                    KeyGuard uses keystroke dynamics
+                    and machine learning for behavioral verification.
+                </p>
+
+                <p style="color: var(--success);">
+                    ● Random Forest Model
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

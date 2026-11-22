@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Behavioral Authentication</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-header">
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="{{ url_for('logout') }}"
+                style="padding: 10px 18px;
+                    background: #dc3545;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 6px;">
+                Logout
+            </a>
+        </div>
+        <h1>Behavioral Authentication</h1>
+        <p>
+            Verify your identity using your unique typing pattern.
+        </p>
+    </div>
+
+    <div class="card">
+
+        <h2>Keystroke Verification</h2>
+
+        <p>
+            Type the following phrase naturally to verify your identity.
+        </p>
+
+        <h2 class="typing-phrase">.tie5Roanl</h2>
+
+        <p>
+            Type the phrase exactly as displayed, including the
+            capital letter R.
+        </p>
+
+        <input
+            type="text"
+            id="typingInput"
+            placeholder="Type .tie5Roanl here"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            required
+        >
+
+        <button id="verifyButton" type="button">
+            Verify My Identity
+        </button>
+
+        <p id="statusMessage" role="status" aria-live="polite"></p>
+
+    </div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/keystroke.js') }}"></script>
+
+<script>
+
+const typingInput = document.getElementById("typingInput");
+const verifyButton = document.getElementById("verifyButton");
+const statusMessage = document.getElementById("statusMessage");
+
+const EXPECTED_PHRASE = ".tie5Roanl";
+
+let extractor = null;
+let isCapturing = false;
+
+
+// =====================================================
+// START KEYSTROKE CAPTURE
+// =====================================================
+
+function startCapture() {
+
+    if (isCapturing) {
+        return;
+    }
+
+    if (typeof KeystrokeExtractor === "undefined") {
+        statusMessage.textContent =
+            "Keystroke capture system could not be loaded.";
+        return;
+    }
+
+    typingInput.value = "";
+
+    extractor = new KeystrokeExtractor();
+
+    extractor.start();
+
+    isCapturing = true;
+
+    typingInput.disabled = false;
+    typingInput.focus();
+
+    verifyButton.textContent = "Submit Typing Sample";
+
+    statusMessage.textContent =
+        "Type .tie5Roanl, press ENTER on your keyboard, then click Submit Typing Sample.";
+
+}
+
+
+// =====================================================
+// SUBMIT AND VERIFY KEYSTROKE SAMPLE
+// =====================================================
+
+async function submitCapture() {
+
+    if (!isCapturing || !extractor) {
+        return;
+    }
+
+    const enteredPhrase = typingInput.value;
+
+    if (enteredPhrase !== EXPECTED_PHRASE) {
+
+        statusMessage.textContent =
+            "Incorrect phrase. Please type .tie5Roanl exactly.";
+
+        return;
+    }
+
+    // Stop capturing keyboard events.
+    const capturedData = extractor.stop();
+
+    isCapturing = false;
+
+    typingInput.disabled = true;
+    verifyButton.disabled = true;
+
+    const events = capturedData.events;
+
+    if (!events || events.length !== 12) {
+
+        statusMessage.textContent =
+            "Incomplete typing sample. Please try again.";
+
+        verifyButton.disabled = false;
+        typingInput.disabled = false;
+
+        extractor = null;
+
+        verifyButton.textContent = "Try Again";
+
+        return;
+    }
+
+    statusMessage.textContent =
+        "Analyzing your typing behavior...";
+
+    try {
+
+        const response = await fetch(
+            "/api/save-keystroke-sample",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    events: events,
+                    enrollment: false,
+                    authentication: true
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || "Authentication failed."
+            );
+        }
+
+        if (result.authenticated === true) {
+
+            statusMessage.textContent =
+                "Behavioral authentication successful! Redirecting...";
+
+            window.location.href = "/user/dashboard";
+
+        } else {
+
+            statusMessage.textContent =
+                result.message ||
+                "Behavioral verification failed. Please try again.";
+
+            resetCapture();
+        }
+
+    } catch (error) {
+
+        statusMessage.textContent = error.message;
+
+        resetCapture();
+    }
+
+}
+
+
+// =====================================================
+// RESET CAPTURE
+// =====================================================
+
+function resetCapture() {
+
+    if (extractor && isCapturing) {
+        extractor.stop();
+    }
+
+    extractor = null;
+    isCapturing = false;
+
+    typingInput.value = "";
+    typingInput.disabled = false;
+
+    verifyButton.disabled = false;
+    verifyButton.textContent = "Try Again";
+
+}
+
+
+// =====================================================
+// BUTTON EVENT
+// =====================================================
+
+verifyButton.addEventListener("click", function () {
+
+    if (!isCapturing) {
+
+        startCapture();
+
+    } else {
+
+        submitCapture();
+
+    }
+
+});
+
+
+// =====================================================
+// INITIAL PAGE STATE
+// =====================================================
+
+typingInput.value = "";
+
+statusMessage.textContent =
+    "Click Verify My Identity to begin.";
+
+</script>
+
+</body>
+</html>

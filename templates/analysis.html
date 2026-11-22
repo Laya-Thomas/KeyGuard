@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Data Analysis</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* ANALYSIS PAGE */
+
+        .analysis-container {
+            width: min(1250px, 94%);
+            margin: auto;
+            padding: 35px 0;
+        }
+
+        .analysis-header {
+            margin-bottom: 35px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+            margin-top: 25px;
+        }
+
+        .analysis-card {
+            padding: 24px;
+            border-radius: var(--radius);
+            background: var(--card-background);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: 0.25s ease;
+            min-width: 0;
+        }
+
+        .analysis-card:hover {
+            border-color: rgba(34, 211, 238, 0.45);
+            transform: translateY(-3px);
+        }
+
+        .analysis-card h3 {
+            color: var(--cyan);
+            margin-bottom: 18px;
+            font-size: 1.1rem;
+        }
+
+        .analysis-card p {
+            font-size: 0.88rem;
+            margin-bottom: 15px;
+        }
+
+        .analysis-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 9px;
+            display: block;
+            background: #ffffff;
+        }
+
+        .analysis-number {
+            color: var(--primary-light);
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-container {
+                width: 92%;
+                padding: 22px 0;
+            }
+
+            .analysis-card {
+                padding: 17px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<!-- ==========================================
+     NAVIGATION
+=========================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+
+            Key<span style="color: var(--cyan);">Guard</span>
+
+        </a>
+    </div>
+
+    <div>
+
+        <span style="color: var(--text-secondary);">
+            Data Analysis
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ==========================================
+     ANALYSIS CONTENT
+=========================================== -->
+
+<div class="analysis-container">
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="analysis-header">
+
+        <h1>Exploratory Data Analysis</h1>
+
+        <p>
+            Analysis and visualization of the CMU Keystroke
+            Dynamics Dataset used in KeyGuard.
+        </p>
+
+    </div>
+
+
+    <!-- ANALYSIS OVERVIEW -->
+
+    <div class="card">
+
+        <h2>Dataset Analysis Overview</h2>
+
+        <p>
+            Exploratory Data Analysis helps understand the
+            statistical properties, feature distributions,
+            subject variations and relationships between
+            keystroke timing features.
+        </p>
+
+        <p style="color: var(--cyan);">
+            ● CMU Keystroke Dynamics Dataset
+        </p>
+
+    </div>
+
+
+    <!-- ======================================
+         VISUALIZATION GRID
+    ======================================= -->
+
+    <div class="analysis-grid">
+
+
+        <!-- HISTOGRAM -->
+
+        <div class="analysis-card">
+
+            <h3>
+                <span class="analysis-number">01.</span>
+                H.Period Distribution
+            </h3>
+
+            <p>
+                Distribution of key hold duration for the
+                period key across recorded samples.
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='images/h_period_histogram.png') }}"
+                alt="H Period Histogram"
+                loading="lazy"
+            >
+
+        </div>
+
+
+        <!-- CORRELATION HEATMAP -->
+
+        <div class="analysis-card">
+
+            <h3>
+                <span class="analysis-number">02.</span>
+                Feature Correlation Heatmap
+            </h3>
+
+            <p>
+                Correlation relationships between the
+                keystroke timing features.
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='images/correlation_heatmap.png') }}"
+                alt="Feature Correlation Heatmap"
+                loading="lazy"
+            >
+
+        </div>
+
+
+        <!-- SUBJECT AVERAGES -->
+
+        <div class="analysis-card">
+
+            <h3>
+                <span class="analysis-number">03.</span>
+                Subject-wise Average Features
+            </h3>
+
+            <p>
+                Comparison of average keystroke timing
+                characteristics across different subjects.
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='images/subject_averages.png') }}"
+                alt="Subject Averages"
+                loading="lazy"
+            >
+
+        </div>
+
+
+        <!-- BOXPLOT -->
+
+        <div class="analysis-card">
+
+            <h3>
+                <span class="analysis-number">04.</span>
+                Subject-wise Feature Distribution
+            </h3>
+
+            <p>
+                Boxplot visualization showing the spread,
+                median and variation of selected features.
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='images/subject_boxplot.png') }}"
+                alt="Subject Boxplot"
+                loading="lazy"
+            >
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ======================================
+         NAVIGATION
+    ======================================= -->
+
+    <a class="btn back-link"
+       href="{{ url_for('admin_dashboard') }}">
+
+        ← Back to Admin Dashboard
+
+    </a>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+
+</div>
+
+</body>
+</html>

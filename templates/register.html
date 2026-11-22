@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Create Account</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div style="max-width: 560px; margin: 45px auto;">
+
+        <!-- BRAND HEADER -->
+        <div class="page-header" style="text-align: center;">
+
+            <h1 style="font-size: 2.8rem;">
+                KeyGuard
+            </h1>
+
+            <p>
+                Behavioral Authentication System
+            </p>
+
+            <p>
+                Create your account and protect your identity
+                through intelligent keystroke dynamics.
+            </p>
+
+        </div>
+
+
+        <!-- REGISTRATION CARD -->
+        <div class="card">
+
+            <h2 style="text-align: center;">
+                Create Your Account
+            </h2>
+
+            <p style="text-align: center;">
+                Enter your details to get started.
+            </p>
+
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- REGISTRATION FORM -->
+            <form method="POST" action="{{ url_for('register') }}">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Choose a username"
+                    minlength="3"
+                    autocomplete="username"
+                    required
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+
+                <label for="confirm_password">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Re-enter your password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+
+                <button type="submit" style="width: 100%;">
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <!-- LOGIN LINK -->
+            <div style="
+                text-align: center;
+                margin-top: 25px;
+                border-top: 1px solid var(--border);
+                padding-top: 20px;
+            ">
+
+                <p>
+                    Already have an account?
+                </p>
+
+                <a href="{{ url_for('login') }}">
+                    Login here
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT INFORMATION -->
+        <div style="text-align: center; margin-top: 22px;">
+
+            <p style="font-size: 0.85rem;">
+                <span style="color: var(--cyan);">●</span>
+                Your account will automatically be registered
+                as a Normal User.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

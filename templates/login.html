@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div style="max-width: 520px; margin: 55px auto;">
+
+        <!-- BRAND HEADER -->
+        <div class="page-header" style="text-align: center;">
+
+            <h1 style="font-size: 2.8rem;">
+                KeyGuard
+            </h1>
+
+            <p>
+                Behavioral Authentication System
+            </p>
+
+            <p>
+                Secure your account with intelligent keystroke dynamics.
+            </p>
+
+        </div>
+
+
+        <!-- LOGIN CARD -->
+        <div class="card">
+
+            <h2 style="text-align: center;">
+                Welcome Back
+            </h2>
+
+            <p style="text-align: center;">
+                Login to access your secure account.
+            </p>
+
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- LOGIN FORM -->
+            <form method="POST" action="{{ url_for('login') }}">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <button type="submit" style="width: 100%;">
+                    Login to KeyGuard
+                </button>
+
+            </form>
+
+
+            <div style="
+                text-align: center;
+                margin-top: 25px;
+                border-top: 1px solid var(--border);
+                padding-top: 20px;
+            ">
+
+                <p>
+                    Don't have an account?
+                </p>
+
+                <a href="{{ url_for('register') }}">
+                    Create a new account
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- SECURITY FOOTER -->
+        <div style="text-align: center; margin-top: 25px;">
+
+            <p style="font-size: 0.82rem;">
+                <span style="color: var(--cyan);">●</span>
+                Protected by KeyGuard Behavioral Authentication
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

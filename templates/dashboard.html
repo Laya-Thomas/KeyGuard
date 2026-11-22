@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ==========================================
+     NAVIGATION
+=========================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+            Key<span style="color: var(--cyan);">Guard</span>
+        </a>
+    </div>
+
+    <div>
+        <span style="color: var(--text-secondary);">
+            Welcome, {{ username }}
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+            Logout
+        </a>
+    </div>
+
+</nav>
+
+
+<!-- ==========================================
+     MAIN DASHBOARD
+=========================================== -->
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>Dashboard Overview</h1>
+
+        <p>
+            Welcome back, {{ username }}!
+            Your KeyGuard system overview is ready.
+        </p>
+
+    </div>
+
+
+    <!-- SYSTEM STATISTICS -->
+
+    <h2>System Status</h2>
+
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+
+            <p>Machine Learning Model</p>
+
+            <h2 style="font-size: 1.5rem;">
+                {{ model_status }}
+            </h2>
+
+            <p style="color: var(--success);">
+                ● Authentication model status
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Authentication Technology</p>
+
+            <h2 style="font-size: 1.5rem;">
+                Random Forest
+            </h2>
+
+            <p>Pairwise behavioral classification</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Behavioral Features</p>
+
+            <h2>31</h2>
+
+            <p>CMU keystroke timing features</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROJECT OVERVIEW -->
+
+    <div style="margin-top: 40px;">
+
+        <h2>Project Overview</h2>
+
+        <div class="card">
+
+            <h3>
+                Behavioral Authentication Using Machine Learning
+            </h3>
+
+            <p>
+                KeyGuard is a behavioral authentication system
+                that uses keystroke dynamics to help verify
+                user identity through typing behavior.
+            </p>
+
+            <p>
+                The system analyzes key hold durations and
+                inter-key timing patterns to distinguish
+                genuine users from impostors.
+            </p>
+
+            <p style="color: var(--cyan);">
+                ● Keystroke Dynamics-Based User Verification
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SYSTEM COMPONENTS -->
+
+    <div style="margin-top: 40px;">
+
+        <h2>System Components</h2>
+
+        <div class="dashboard-grid">
+
+            <div class="card">
+
+                <h3>Dataset Management</h3>
+
+                <p>
+                    Explore the CMU keystroke dynamics dataset,
+                    its subjects, sessions and timing features.
+                </p>
+
+                <a href="{{ url_for('admin_dataset') }}"
+                   class="btn">
+                    View Dataset
+                </a>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>Data Analysis</h3>
+
+                <p>
+                    Explore statistical distributions,
+                    feature correlations and data visualizations.
+                </p>
+
+                <a href="{{ url_for('admin_analysis') }}"
+                   class="btn">
+                    View Analysis
+                </a>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>User Management</h3>
+
+                <p>
+                    View registered accounts and their
+                    assigned account roles.
+                </p>
+
+                <a href="{{ url_for('admin_users') }}"
+                   class="btn">
+                    Manage Users
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

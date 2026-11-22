@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | User Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ==========================================
+     NAVIGATION
+=========================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('user_dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+            Key<span style="color: var(--cyan);">Guard</span>
+        </a>
+    </div>
+
+    <div>
+        <span style="color: var(--text-secondary);">
+            Normal User
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+            Logout
+        </a>
+    </div>
+
+</nav>
+
+
+<!-- ==========================================
+     MAIN DASHBOARD
+=========================================== -->
+
+<div class="container">
+
+
+    <!-- WELCOME HEADER -->
+
+    <div class="page-header">
+
+        <h1>Welcome, {{ username }}!</h1>
+
+        <p>
+            Your personal KeyGuard security dashboard.
+            Monitor your account and behavioral authentication status.
+        </p>
+
+    </div>
+
+
+    <!-- ======================================
+         ACCOUNT OVERVIEW
+    ======================================= -->
+
+    <h2>Account Overview</h2>
+
+    <div class="dashboard-grid">
+
+        <!-- ACCOUNT STATUS -->
+
+        <div class="stat-card">
+
+            <p>Account Status</p>
+
+            <h2 style="color: var(--success); font-size: 1.6rem;">
+                Active
+            </h2>
+
+            <p>Your account is registered.</p>
+
+        </div>
+
+
+        <!-- ACCOUNT ROLE -->
+
+        <div class="stat-card">
+
+            <p>Account Role</p>
+
+            <h2 style="font-size: 1.6rem;">
+                Normal User
+            </h2>
+
+            <p>Standard KeyGuard account.</p>
+
+        </div>
+
+
+        <!-- ENROLLMENT STATUS -->
+
+        <div class="stat-card">
+
+            <p>Behavioral Enrollment</p>
+
+            {% if enrollment_completed %}
+
+                <h2 style="color: var(--success); font-size: 1.6rem;">
+                    Completed
+                </h2>
+
+                <p>3 of 3 samples collected.</p>
+
+            {% else %}
+
+                <h2 style="color: var(--warning); font-size: 1.6rem;">
+                    In Progress
+                </h2>
+
+                <p>
+                    {{ enrollment_count }} of 3 samples collected.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         SECURITY OVERVIEW
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <h2>Your Security</h2>
+
+        <div class="card">
+
+            <h3>Behavioral Biometrics</h3>
+
+            <p>
+                KeyGuard uses keystroke dynamics and machine learning
+                to analyze typing patterns and help verify your identity.
+            </p>
+
+            <p>
+                Your typing rhythm, key hold durations and
+                inter-key timing patterns are analyzed using
+                a Random Forest classification model.
+            </p>
+
+            <p style="color: var(--cyan);">
+                ● Behavioral authentication powered by machine learning
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         ENROLLMENT PROGRESS
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <h2>Enrollment Progress</h2>
+
+        <div class="card">
+
+            {% if enrollment_completed %}
+
+                <h3 style="color: var(--success);">
+                    Enrollment Completed
+                </h3>
+
+                <p>
+                    Your three behavioral enrollment samples
+                    have been collected successfully.
+                </p>
+
+                <div class="enrollment-progress-track">
+
+                    <div
+                        class="enrollment-progress-fill"
+                        data-progress="100">
+                    </div>
+
+                </div>
+
+                <p>Progress: 3 / 3 samples</p>
+
+            {% else %}
+
+                <h3>
+                    Complete Your Behavioral Enrollment
+                </h3>
+
+                <p>
+                    You need three typing samples to create
+                    your behavioral enrollment profile.
+                </p>
+
+                <div class="enrollment-progress-track">
+
+                    <div
+                        class="enrollment-progress-fill"
+                        data-progress="{{ (enrollment_count / 3 * 100)|int }}">
+                    </div>
+
+                </div>
+
+                <p>
+                    Progress: {{ enrollment_count }} / 3 samples
+                </p>
+
+                <a href="{{ url_for('enrollment') }}"
+                   class="btn">
+                    Continue Enrollment
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         QUICK ACTIONS
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <h2>Quick Actions</h2>
+
+        <div class="dashboard-grid">
+
+            <!-- BEHAVIORAL AUTHENTICATION -->
+
+            <div class="card">
+
+                <h3>Behavioral Authentication</h3>
+
+                <p>
+                    Verify your identity using your
+                    registered typing pattern.
+                </p>
+
+                {% if enrollment_completed %}
+
+                    <a href="{{ url_for('authentication') }}"
+                       class="btn">
+                        Verify Identity
+                    </a>
+
+                {% else %}
+
+                    <p style="color: var(--warning);">
+                        Complete enrollment first.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ACCOUNT SECURITY -->
+
+            <div class="card">
+
+                <h3>Account Security</h3>
+
+                <p>
+                    Your account uses password-based login
+                    and behavioral verification.
+                </p>
+
+                <p style="color: var(--success);">
+                    ● Security features enabled
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         FOOTER
+    ======================================= -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+</div>
+
+
+<!-- ==========================================
+     ENROLLMENT PROGRESS BAR JAVASCRIPT
+=========================================== -->
+
+<script>
+
+document.querySelectorAll(
+    ".enrollment-progress-fill"
+).forEach(function(bar) {
+
+    const progress = Number(bar.dataset.progress);
+
+    const safeProgress = Math.min(
+        100,
+        Math.max(0, progress)
+    );
+
+    bar.style.width = safeProgress + "%";
+
+});
+
+</script>
+
+</body>
+</html>

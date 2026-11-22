@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KeyGuard | Dataset Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ==========================================
+     NAVIGATION
+=========================================== -->
+
+<nav>
+
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}"
+           style="font-size: 1.5rem; font-weight: 800;">
+            Key<span style="color: var(--cyan);">Guard</span>
+        </a>
+    </div>
+
+    <div>
+        <span style="color: var(--text-secondary);">
+            Dataset Management
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn"
+           style="margin-left: 15px;">
+            Logout
+        </a>
+    </div>
+
+</nav>
+
+
+<div class="container">
+
+    <!-- ======================================
+         PAGE HEADER
+    ======================================= -->
+
+    <div class="page-header">
+
+        <h1>Dataset Management</h1>
+
+        <p>
+            Explore and monitor the keystroke dynamics dataset
+            used by the KeyGuard machine learning system.
+        </p>
+
+    </div>
+
+
+    <!-- ======================================
+         DATASET INFORMATION
+    ======================================= -->
+
+    <h2>Dataset Information</h2>
+
+    <div class="card">
+
+        <h3>{{ dataset_name }}</h3>
+
+        <p>
+            <strong>Dataset Status:</strong>
+
+            <span style="color: var(--success);">
+                {{ dataset_status }}
+            </span>
+        </p>
+
+        <p>
+            This dataset contains keystroke timing information
+            used for behavioral authentication research.
+        </p>
+
+    </div>
+
+
+    <!-- ======================================
+         DATASET STATISTICS
+    ======================================= -->
+
+    <h2 style="margin-top: 35px;">
+        Dataset Statistics
+    </h2>
+
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+
+            <p>Total Samples</p>
+
+            <h2>{{ total_samples }}</h2>
+
+            <p>Keystroke records</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Total Subjects</p>
+
+            <h2>{{ total_subjects }}</h2>
+
+            <p>Unique participants</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Total Features</p>
+
+            <h2>{{ total_features }}</h2>
+
+            <p>Timing features</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Total Sessions</p>
+
+            <h2>{{ total_sessions }}</h2>
+
+            <p>Recording sessions</p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <p>Total Columns</p>
+
+            <h2>{{ total_columns }}</h2>
+
+            <p>Dataset attributes</p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         DATASET COLUMNS
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <div class="card">
+
+            <h2>Dataset Features and Columns</h2>
+
+            <p>
+                All columns available in the selected dataset.
+            </p>
+
+            {% if columns %}
+
+                <div class="feature-grid">
+
+                    {% for column in columns %}
+
+                        <div class="feature-item">
+                            {{ column }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p>No dataset columns available.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         DATASET PREVIEW
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <div class="card">
+
+            <h2>Dataset Preview</h2>
+
+            <p>
+                Showing the first 10 records from the dataset.
+            </p>
+
+            {% if rows %}
+
+                <div style="overflow-x: auto;">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                {% for column in columns %}
+
+                                    <th>{{ column }}</th>
+
+                                {% endfor %}
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for row in rows %}
+
+                                <tr>
+
+                                    {% for value in row %}
+
+                                        <td>{{ value }}</td>
+
+                                    {% endfor %}
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <p>No dataset records available.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         SUBJECT DISTRIBUTION
+    ======================================= -->
+
+    <div style="margin-top: 40px;">
+
+        <div class="card">
+
+            <h2>Subject Distribution</h2>
+
+            <p>
+                Number of keystroke samples recorded for each subject.
+            </p>
+
+            {% if subject_distribution %}
+
+                <div style="overflow-x: auto;">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Subject</th>
+                                <th>Number of Samples</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for item in subject_distribution %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>{{ item.subject }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ item.count }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <p>Subject information is unavailable.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         ADMIN NAVIGATION
+    ======================================= -->
+
+    <div style="margin-top: 35px;">
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="btn">
+            Back to Admin Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- ======================================
+         FOOTER
+    ======================================= -->
+
+    <footer>
+
+        <p>
+            KeyGuard — Behavioral Authentication Using Machine Learning
+        </p>
+
+        <p>
+            Keystroke Dynamics-Based User Verification
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+</html>
