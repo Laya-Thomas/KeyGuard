@@ -2,7 +2,7 @@
 """
 KeyGuard - CMU Live Feature Processor
 
-Converts browser keyboard events into the exact 31 timing
+Converts browser keyboard events into the 31 timing
 features used by the CMU Keystroke Dynamics dataset.
 
 Input timestamps: milliseconds
@@ -12,6 +12,7 @@ Output timing features: seconds
 import csv
 import math
 import uuid
+
 from datetime import datetime
 from pathlib import Path
 
@@ -72,7 +73,7 @@ CMU_FEATURES = [
 
 # The phrase is: .tie5Roanl
 #
-# Shift is captured as a separate key event.
+# Shift is captured as a separate physical key event.
 # Either left or right Shift is accepted.
 
 EXPECTED_KEYS_LEFT_SHIFT = [
@@ -112,43 +113,64 @@ EXPECTED_KEYS_RIGHT_SHIFT = [
 
 def validate_keyboard_events(events):
     """
-    Validate browser keyboard events and return completed events.
+    Validate browser keyboard events and return
+    completed events.
     """
 
     if not isinstance(events, list):
-        raise ValueError("Keyboard events must be a list.")
+        raise ValueError(
+            "Keyboard events must be a list."
+        )
 
     completed = []
 
     for event in events:
 
         if not isinstance(event, dict):
-            raise ValueError("Invalid keyboard event.")
+            raise ValueError(
+                "Invalid keyboard event."
+            )
 
         if event.get("up") is None:
             continue
 
         if event.get("code") is None:
-            raise ValueError("A keyboard event is missing its key code.")
+            raise ValueError(
+                "A keyboard event is missing its key code."
+            )
 
         try:
             down = float(event["down"])
             up = float(event["up"])
             hold = float(event["hold"])
-        except (KeyError, TypeError, ValueError):
-            raise ValueError("Invalid keyboard timing values.")
 
-        if not all(math.isfinite(value) for value in (down, up, hold)):
-            raise ValueError("Keyboard timings must be finite numbers.")
+        except (KeyError, TypeError, ValueError):
+            raise ValueError(
+                "Invalid keyboard timing values."
+            )
+
+        if not all(
+            math.isfinite(value)
+            for value in (down, up, hold)
+        ):
+            raise ValueError(
+                "Keyboard timings must be finite numbers."
+            )
 
         if up < down or hold < 0:
-            raise ValueError("Invalid key timing values.")
+            raise ValueError(
+                "Invalid key timing values."
+            )
 
-        # Check that the recorded hold time agrees with timestamps.
+        # Check that recorded hold time agrees
+        # with the down and up timestamps.
+
         calculated_hold = up - down
 
         if abs(calculated_hold - hold) > 2.0:
-            raise ValueError("Inconsistent key hold time.")
+            raise ValueError(
+                "Inconsistent key hold time."
+            )
 
         completed.append({
             "code": str(event["code"]),
@@ -157,11 +179,15 @@ def validate_keyboard_events(events):
             "hold": hold
         })
 
-    completed.sort(key=lambda item: item["down"])
+    # Sort events by keydown timestamp.
+    completed.sort(
+        key=lambda item: item["down"]
+    )
 
     if len(completed) != 12:
         raise ValueError(
-            "The phrase must contain exactly 12 completed key events."
+            "The phrase must contain exactly "
+            "12 completed key events."
         )
 
     return completed
@@ -175,22 +201,26 @@ def build_cmu_features(events):
     """
     Convert browser events into the 31 CMU timing features.
 
-    The CMU feature sequence uses the Shift event in the
-    Shift.r position. The R key is checked in the typed
-    phrase but is not a separate feature in this mapping.
+    The physical Shift key is validated as a modifier.
+    KeyR is used for the uppercase R feature position.
     """
 
     completed = validate_keyboard_events(events)
 
+    # -----------------------------------------------------
+    # IDENTIFY LEFT OR RIGHT SHIFT
+    # -----------------------------------------------------
+
     actual_keys = [
-        event["code"] for event in completed
+        event["code"]
+        for event in completed
     ]
 
     if actual_keys == EXPECTED_KEYS_LEFT_SHIFT:
-        shift_code = "ShiftLeft"
+        pass
 
     elif actual_keys == EXPECTED_KEYS_RIGHT_SHIFT:
-        shift_code = "ShiftRight"
+        pass
 
     else:
         raise ValueError(
@@ -199,15 +229,20 @@ def build_cmu_features(events):
             f"Received keys: {actual_keys}"
         )
 
-    # Select the 11 events represented in the CMU features.
-    # KeyR is validated but omitted from the feature sequence.
+    # -----------------------------------------------------
+    # SELECT THE 11 EVENTS REPRESENTED IN CMU FEATURES
+    # -----------------------------------------------------
+
+    # KeyR represents the uppercase R position.
+    # The separate physical Shift event is not selected.
+
     feature_codes = [
         "Period",
         "KeyT",
         "KeyI",
         "KeyE",
         "Digit5",
-        shift_code,
+        "KeyR",
         "KeyO",
         "KeyA",
         "KeyN",
@@ -228,7 +263,7 @@ def build_cmu_features(events):
     features = {}
 
     # -----------------------------------------------------
-    # Hold-time features
+    # HOLD-TIME FEATURES
     # -----------------------------------------------------
 
     hold_names = [
@@ -245,11 +280,17 @@ def build_cmu_features(events):
         "H.Return"
     ]
 
-    for name, event in zip(hold_names, feature_events):
-        features[name] = event["hold"] / 1000.0
+    for name, event in zip(
+        hold_names,
+        feature_events
+    ):
+
+        features[name] = (
+            event["hold"] / 1000.0
+        )
 
     # -----------------------------------------------------
-    # Down-down and up-down transition features
+    # DOWN-DOWN AND UP-DOWN TRANSITION FEATURES
     # -----------------------------------------------------
 
     transitions = [
@@ -265,30 +306,59 @@ def build_cmu_features(events):
         ("l", "Return")
     ]
 
-    for index, (first, second) in enumerate(transitions):
+    for index, (first, second) in enumerate(
+        transitions
+    ):
 
         first_event = feature_events[index]
         second_event = feature_events[index + 1]
 
+        # Down-Down time:
+        # Difference between two keydown timestamps.
+
         dd = (
-            second_event["down"] - first_event["down"]
+            second_event["down"]
+            - first_event["down"]
         )
+
+        # Up-Down time:
+        # Difference between the first keyup
+        # and the next keydown.
 
         ud = (
-            second_event["down"] - first_event["up"]
+            second_event["down"]
+            - first_event["up"]
         )
 
-        features[f"DD.{first}.{second}"] = dd / 1000.0
-        features[f"UD.{first}.{second}"] = ud / 1000.0
+        features[
+            f"DD.{first}.{second}"
+        ] = dd / 1000.0
 
-    # Return features in the exact CMU dataset order.
+        features[
+            f"UD.{first}.{second}"
+        ] = ud / 1000.0
+
+    # -----------------------------------------------------
+    # RETURN FEATURES IN EXACT CMU ORDER
+    # -----------------------------------------------------
+
     ordered_features = {
         name: features[name]
         for name in CMU_FEATURES
     }
 
     if len(ordered_features) != 31:
-        raise ValueError("Expected exactly 31 CMU features.")
+        raise ValueError(
+            "Expected exactly 31 CMU features."
+        )
+
+    if not all(
+        math.isfinite(value)
+        for value in ordered_features.values()
+    ):
+        raise ValueError(
+            "Generated features contain invalid values."
+        )
 
     return ordered_features
 
@@ -314,7 +384,11 @@ def get_feature_vector(events):
 # 7. SAVE LIVE KEYSTROKE FEATURES
 # =========================================================
 
-def save_live_features(user_id, events, sample_type="test"):
+def save_live_features(
+    user_id,
+    events,
+    sample_type="test"
+):
     """
     Save a live keystroke sample to authentication_dataset.csv.
 
@@ -325,7 +399,9 @@ def save_live_features(user_id, events, sample_type="test"):
     """
 
     if user_id is None or str(user_id).strip() == "":
-        raise ValueError("A valid user ID is required.")
+        raise ValueError(
+            "A valid user ID is required."
+        )
 
     allowed_types = {
         "enrollment",
@@ -334,12 +410,14 @@ def save_live_features(user_id, events, sample_type="test"):
     }
 
     if sample_type not in allowed_types:
-        raise ValueError("Invalid sample type.")
+        raise ValueError(
+            "Invalid sample type."
+        )
 
     # Extract the 31 CMU features.
     features = build_cmu_features(events)
 
-    # Ensure the dataset directory exists.
+    # Ensure dataset directory exists.
     LIVE_DATASET_PATH.parent.mkdir(
         parents=True,
         exist_ok=True
@@ -385,7 +463,10 @@ def save_live_features(user_id, events, sample_type="test"):
 
         writer.writerow(row)
 
-    print("Live keystroke sample saved successfully.")
+    print(
+        "Live keystroke sample saved successfully."
+    )
+
     print("User ID:", user_id)
     print("Sample type:", sample_type)
     print("Feature count:", len(features))

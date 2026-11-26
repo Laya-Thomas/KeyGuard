@@ -1,4 +1,7 @@
 
+from asyncio import events
+from unittest import result
+
 import pandas as pd
 import os
 import joblib
@@ -598,7 +601,17 @@ def save_keystroke_sample():
             }, 400
 
         events = data.get("events")
+        print("\n========== RAW KEYBOARD EVENTS ==========")
 
+        for event in events:
+            print(
+            "Key:", event.get("code"),
+            "| Down:", event.get("down"),
+            "| Up:", event.get("up"),
+            "| Hold:", event.get("hold")
+            )
+
+            print("=========================================\n")
         if not isinstance(events, list):
             return {
                 "success": False,
@@ -667,8 +680,17 @@ def save_keystroke_sample():
                 }, 400
 
             # Run the trained Random Forest model.
+            
             result = verify_user(user_id, events)
-            print("DEBUG - Starting Random Forest verification for:", user_id)
+
+            print("\n========== KEYGUARD VERIFICATION DEBUG ==========")
+            print("User ID:", user_id)
+            print("Decision:", result["decision"])
+            print("Authenticated:", result["authenticated"])
+            print("Genuine comparisons:", result["genuine_comparisons"])
+            print("Impostor comparisons:", result["impostor_comparisons"])
+            print("Genuine probability:", result["genuine_probability"])
+            print("=================================================\n")
             if result["authenticated"]:
 
                 save_live_features(
